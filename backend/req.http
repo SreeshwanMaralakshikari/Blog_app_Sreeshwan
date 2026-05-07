@@ -1,0 +1,10 @@
+POST https://q47-blog-app.onrender.com/author-api/articles
+Content-Type: application/json
+
+{
+    "author":"69fc4d8b12b92c59625c3a9c",
+    "title":"Article-1 created by Author-2",
+    "category":"Java",
+    "content":"Latest Updates in Java"
+
+}

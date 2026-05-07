@@ -1,0 +1,35 @@
+### Create new Article
+POST http://localhost:2006/author-api/article
+Content-Type: application/json
+
+{
+    "author":"69b38ff0a447c1dc85154a53",
+    "title":"Article-1 created by Author-2",
+    "category":"Java",
+    "content":"Latest Updates in Java"
+
+}
+
+###Read own Articles
+GET http://localhost:2006/author-api/articles
+
+
+### Update a Article
+PUT  http://localhost:2006/author-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3cbb2505f86e600f48126",
+    "title":"Article-3 by Author 1",
+    "category":"AIML",
+    "content":"test article on AI and its updated"
+}
+
+### DELETE OR RESTORE Article by Article ID (Soft Delete)
+PATCH http://localhost:2006/author-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3c7a033b8b3c24d6af1f3",
+    "isArticleActive":false
+}

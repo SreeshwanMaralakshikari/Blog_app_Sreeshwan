@@ -1,0 +1,20 @@
+###Read All Users
+GET http://localhost:2006/admin-api/users
+
+###For User Deactivation
+PATCH http://localhost:2006/admin-api/users/deactivate
+Content-Type: application/json
+
+{
+    "userId":"69b38ff0a447c1dc85154a53",
+    "isUserActive":false
+}
+
+###For User Activation
+PATCH http://localhost:2006/admin-api/users/activate
+Content-Type: application/json
+
+{
+    "userId":"69b38ff0a447c1dc85154a53",
+    "isUserActive":true
+}

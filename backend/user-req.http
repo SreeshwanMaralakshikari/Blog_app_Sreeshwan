@@ -1,0 +1,45 @@
+###Register User
+POST http://localhost:2006/auth/users
+Content-Type: application/json
+
+{
+    "firstName":"author3",
+    "lastName":"",
+    "email":"author3@gmail.com",
+    "password":"author2",
+    "role":"AUTHOR",
+    "profileImageUrl":"https://example.com/avatars/user.png"
+}
+
+###User Login
+POST https://q47-blog-app.onrender.com/auth/login
+Content-Type: application/json
+
+{
+    "email":"author12345@gmail.com",
+    "password":"author12345"
+}
+
+###User Logout
+GET http://localhost:2006/auth/logout
+
+###Change Password
+PUT http://localhost:2006/auth/password
+Content-Type: application/json
+
+{
+    "currentPassword":"user12",
+    "newPassword":"user13"
+}
+
+### Read articles of all authors
+GET  https://q47-blog-app.onrender.com/user-api/articles
+
+### Add comment by user 
+PUT http://localhost:2006/user-api/article
+Content-Type: application/json
+
+{
+    "articleId":"69b3ab61b8bc15f7b841fb24",
+    "comment":"This is useful article"
+}
