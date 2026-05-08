@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ###User Login
-POST https://q47-blog-app.onrender.com/auth/login
+POST https://blog-app-sreeshwan.onrender.com/auth/login
 Content-Type: application/json
 
 {
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ###User Logout
-GET http://localhost:2006/auth/logout
+GET https://blog-app-sreeshwan.onrender.com/auth/logout
 
 ###Change Password
 PUT http://localhost:2006/auth/password
@@ -33,7 +33,7 @@ Content-Type: application/json
 }
 
 ### Read articles of all authors
-GET  https://q47-blog-app.onrender.com/user-api/articles
+GET  https://blog-app-sreeshwan.onrender.com/user-api/articles
 
 ### Add comment by user 
 PUT http://localhost:2006/user-api/article
