@@ -14,7 +14,7 @@ config();
 const app=exp();
 
 app.use(cors({
-    origin:["http://localhost:5173"],
+    origin:["http://localhost:5173","https://blog-app-sreeshwan-inxr.vercel.app"],
     credentials:true,
 }),
 );
