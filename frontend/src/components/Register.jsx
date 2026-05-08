@@ -57,6 +57,7 @@ function Register() {
       //start loading
       setLoading(true);
       let res=await axiosInstance.post("/auth/users",formData)
+      console.log(res);
       if(res.status===201)
       {
         //navigate to Login
