@@ -104,11 +104,7 @@ commonApp.post("/login",async(req,res)=>{
         },
         process.env.SECRET_KEY,{expiresIn:"6h"});
 
-    res.cookie("token",signedToken,{
-        httpOnly:true,
-        secure:false,
-        sameSite:""
-    })
+    res.cookie("token",signedToken,cookieOptions)
 
     //send res to user
     const userObj=user.toObject();
@@ -119,7 +115,7 @@ commonApp.post("/login",async(req,res)=>{
 //Route for Logout
 commonApp.get("/logout",(req,res)=>{
     //delete token from cookie storage
-    res.clearCookie("token",token,cookieOptions)
+    res.clearCookie("token",cookieOptions)
     //send res
     res.status(200).json({message:"Logout Success"});
 })
