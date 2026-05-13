@@ -62,55 +62,13 @@ commonApp.post("/users", upload.single("profileImageUrl"), async (req, res,next)
   }
 });
 
+const isProduction = process.env.NODE_ENV === 'production'
 
-/*Route for Register
-commonApp.post("/users",upload.single("profileImageUrl"),async(req,res)=>{
-    try{
-    //roles accepted to register
-    let allowedRoles=["USER","AUTHOR"];
-
-    //get user from req
-    const newUser=req.body;
-    console.log(req.body)
-    //check if role is admin, then send error image
-    if(!allowedRoles.includes(newUser.role)){
-        return res.status(400).json({message:"Invalid Role"});
-    }
-
-    let cloudinaryResult;
-    //upload image to cloudinary from memory storage
-    if(req.file)
-    {
-        cloudinaryResult=await uploadToCloudinary(req.file.buffer);
-    }
-
-    //add CDN Link of image to newUserObj
-    newUser.profileImageUrl=cloudinaryResult?.secure_url;
-
-    //run validators manually!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
-
-    //hash password and replace plain  with hashed password
-    newUser.password=await hash(newUser.password,12);
-
-    //create New User Document
-    const newUserDoc=new UserModel(newUser);
-
-    //save document
-    await newUserDoc.save();
-
-    //send res
-    res.status(201).json({message:"User Created"});
-    }catch(err)
-    {
-        //delete image from cloudinary
-        if(cloudinaryResult.public_id)
-        {
-            await cloudinary.uploader.destroy(cloudinaryResult.public_id);
-        }
-        next(err);
-    }
-})*/
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax'
+}
 
 //Route for Login
 commonApp.post("/login",async(req,res)=>{
@@ -149,7 +107,7 @@ commonApp.post("/login",async(req,res)=>{
     res.cookie("token",signedToken,{
         httpOnly:true,
         secure:false,
-        sameSite:"lax"
+        sameSite:""
     })
 
     //send res to user
@@ -161,11 +119,7 @@ commonApp.post("/login",async(req,res)=>{
 //Route for Logout
 commonApp.get("/logout",(req,res)=>{
     //delete token from cookie storage
-    res.clearCookie("token",{
-        httpOnly:true,
-        secure:false,
-        sameSite:"lax"
-    })
+    res.clearCookie("token",token,cookieOptions)
     //send res
     res.status(200).json({message:"Logout Success"});
 })

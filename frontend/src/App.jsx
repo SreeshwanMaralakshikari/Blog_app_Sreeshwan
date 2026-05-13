@@ -93,7 +93,7 @@ function App() {
 
   return (
     <div>
-      <Toaster pattern="top-order" reverseOrder={false}/>
+      <Toaster position="top-order" reverseOrder={false}/>
       <RouterProvider router={routerObj} />
   </div>
 );
