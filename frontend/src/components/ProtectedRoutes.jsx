@@ -10,9 +10,9 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <p>Loading...</p>;
   }
   //if user not loggedin
-  if (!isAuthenticated) {
-    toast.error
-    //redirect to Login
+  if(!isAuthenticated) 
+  {
+    toast.error("Please login to access this page");
     return <Navigate to="/login" replace />;
   }
 
