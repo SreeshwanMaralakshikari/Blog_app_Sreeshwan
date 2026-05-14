@@ -64,6 +64,11 @@ commonApp.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Invalid Password" });
   }
 
+  if(!user.isUserActive)
+  {
+    return res.status(400).json({ message: "User has been deactivated" });
+  }
+
   const signedToken = sign(
     {
       id: user._id,
