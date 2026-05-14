@@ -51,10 +51,9 @@ function WriteArticles() {
         toast.success("Article Successfully Published");
         navigate("../articles");
     }
-   
     } catch (err) {
       toast.error(err.response?.data?.error || "Failed to publish article");
-      console.log(res);
+      console.log(err);
     } finally {
       setLoading(false);
     }
