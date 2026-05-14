@@ -1,7 +1,7 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "../axiosInstance.js";
 import { useParams, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { useAuth } from "../store/authStore";
+import { useAuth } from "../store/authStore.js";
 import { toast } from "react-hot-toast"; // ✅ Added missing import
 import {
   articlePageWrapper, articleHeader, articleCategory, articleMainTitle,
