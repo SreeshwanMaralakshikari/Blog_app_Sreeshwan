@@ -1,7 +1,7 @@
-import axiosInstance from "../axiosInstance.js";
+import axiosInstance from "./axiosInstance.js";
 import { useParams, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { useAuth } from "../store/authStore.js";
+import { useAuth } from "./store/authStore.js";
 import { toast } from "react-hot-toast"; // ✅ Added missing import
 import {
   articlePageWrapper, articleHeader, articleCategory, articleMainTitle,
@@ -9,7 +9,7 @@ import {
   articleActions, editBtn, deleteBtn, loadingClass, errorClass,
   inputClass, commentsWrapper, commentCard, commentHeader,
   commentUserRow, avatar, commentUser, commentTime, commentText,
-} from "../styles/common.js";
+} from "./styles/common.js";
 import { useForm } from "react-hook-form";
 
 function ArticleByID() {
