@@ -1,31 +1,14 @@
 import axiosInstance from "../axiosInstance";
 import { useParams, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useAuth } from "../store/authStore";
+import { toast } from "react-hot-toast"; // ✅ Added missing import
 import {
-  articlePageWrapper,
-  articleHeader,
-  articleCategory,
-  articleMainTitle,
-  articleAuthorRow,
-  authorInfo,
-  articleContent,
-  articleFooter,
-  articleActions,
-  editBtn,
-  deleteBtn,
-  loadingClass,
-  errorClass,
-  inputClass,
-  commentsWrapper,
-  commentCard,
-  commentHeader,
-  commentUserRow,
-  avatar,
-  commentUser,
-  commentTime,
-  commentText,
+  articlePageWrapper, articleHeader, articleCategory, articleMainTitle,
+  articleAuthorRow, authorInfo, articleContent, articleFooter,
+  articleActions, editBtn, deleteBtn, loadingClass, errorClass,
+  inputClass, commentsWrapper, commentCard, commentHeader,
+  commentUserRow, avatar, commentUser, commentTime, commentText,
 } from "../styles/common.js";
 import { useForm } from "react-hook-form";
 
@@ -34,7 +17,6 @@ function ArticleByID() {
   const location = useLocation();
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
-
   const user = useAuth((state) => state.currentUser);
 
   const [article, setArticle] = useState(location.state || null);
@@ -42,19 +24,21 @@ function ArticleByID() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    //if article is transfered, then use it
     if (article) return;
 
-    //otherwise make api req to read that article by id
     const getArticle = async () => {
       setLoading(true);
-
       try {
-        const res = await axiosInstance.get(`/user-api/article/${id}`);
-
-        setArticle(res.data.payload);
+        // ✅ Fixed: correct route that exists in backend
+        const res = await axiosInstance.get(`/user-api/articles`);
+        const found = res.data.payload.find((a) => a._id === id);
+        if (found) {
+          setArticle(found);
+        } else {
+          setError("Article not found");
+        }
       } catch (err) {
-        setError(err.response?.data?.error);
+        setError(err.response?.data?.message || "Failed to load article");
       } finally {
         setLoading(false);
       }
@@ -71,51 +55,38 @@ function ArticleByID() {
     });
   };
 
-  // delete & restore article
   const toggleArticleStatus = async () => {
     const newStatus = !article.isArticleActive;
-
     const confirmMsg = newStatus ? "Restore this article?" : "Delete this article?";
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const res = await axiosInstance.patch(
-        `/author-api/article`,
-        {articleId: article._id, isArticleActive: newStatus },
-      );
-
-      console.log("SUCCESS:", res.data);
-
+      const res = await axiosInstance.patch("/author-api/article", {
+        articleId: article._id,
+        isArticleActive: newStatus,
+      });
       setArticle(res.data.payload);
-
-      //toast.success(res.data.message);
+      toast.success(res.data.message);
     } catch (err) {
-      console.log("ERROR:", err.response);
-
       const msg = err.response?.data?.message;
-
-      if (err.response?.status === 400) {
-        toast(msg); // already deleted/active case
-      } else {
-        setError(msg || "Operation failed");
-      }
+      toast.error(msg || "Operation failed");
     }
   };
 
-  //edit article
   const editArticle = (articleObj) => {
     navigate("/edit-article", { state: articleObj });
   };
 
-  //post comment by user
   const addComment = async (commentObj) => {
-    //add artcileId
     commentObj.articleId = article._id;
-    console.log(commentObj);
-    let res = await axiosInstance.put("/user-api/article", commentObj);
-    if (res.status === 200) {
-      //toast.success(res.data.message);
-      setArticle(res.data.payload);
+    try {
+      let res = await axiosInstance.put("/user-api/article", commentObj);
+      if (res.status === 200) {
+        toast.success("Comment added!");
+        setArticle(res.data.payload);
+      }
+    } catch (err) {
+      toast.error("Failed to add comment");
     }
   };
 
@@ -125,36 +96,26 @@ function ArticleByID() {
 
   return (
     <div className={articlePageWrapper}>
-      {/* Header */}
       <div className={articleHeader}>
         <span className={articleCategory}>{article.category}</span>
-
         <h1 className={`${articleMainTitle} uppercase`}>{article.title}</h1>
-
         <div className={articleAuthorRow}>
           <div className={authorInfo}>✍️ {article.author?.firstName || "Author"}</div>
-
           <div>{formatDate(article.createdAt)}</div>
         </div>
       </div>
 
-      {/* Content */}
       <div className={articleContent}>{article.content}</div>
 
-      {/* AUTHOR actions */}
       {user?.role === "AUTHOR" && (
         <div className={articleActions}>
-          <button className={editBtn} onClick={() => editArticle(article)}>
-            Edit
-          </button>
-
+          <button className={editBtn} onClick={() => editArticle(article)}>Edit</button>
           <button className={deleteBtn} onClick={toggleArticleStatus}>
             {article.isArticleActive ? "Delete" : "Restore"}
           </button>
         </div>
       )}
-      {/* form to add comment if role is USER */}
-      {/* USER actions */}
+
       {user?.role === "USER" && (
         <div className={articleActions}>
           <form onSubmit={handleSubmit(addComment)}>
@@ -171,48 +132,33 @@ function ArticleByID() {
         </div>
       )}
 
-      {/* comments */}
-      {/* Comments */}
       <div className={commentsWrapper}>
-        {article.comments?.length === 0 && <p className="text-[#a1a1a6] text-sm text-center">No comments yet</p>}
-
+        {article.comments?.length === 0 && (
+          <p className="text-[#a1a1a6] text-sm text-center">No comments yet</p>
+        )}
         {article.comments?.map((commentObj, index) => {
-          console.log(commentObj);
           const name = commentObj.user?.email || "User";
           const firstLetter = name.charAt(0).toUpperCase();
-
           return (
             <div key={index} className={commentCard}>
-              {/* Header */}
               <div className={commentHeader}>
                 <div className={commentUserRow}>
                   <div className={avatar}>{firstLetter}</div>
-
                   <div>
                     <p className={commentUser}>{name}</p>
                     <p className={commentTime}>{formatDate(commentObj.createdAt || new Date())}</p>
                   </div>
                 </div>
               </div>
-
-              {/* Comment */}
               <p className={commentText}>{commentObj.comment}</p>
             </div>
           );
         })}
       </div>
 
-      {/* Footer */}
       <div className={articleFooter}>Last updated: {formatDate(article.updatedAt)}</div>
     </div>
   );
 }
 
 export default ArticleByID;
-
-// {
-//   "user":"6989799b7013502767d3f82b",
-//   "articleId":"6989750220ce5bf826ec4f7e",
-//   "comment":"good article"
-
-// }
