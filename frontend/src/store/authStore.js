@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import axios from "axios";
 import axiosInstance from "../axiosInstance";
 
 export const useAuth = create((set) => ({
@@ -7,15 +6,14 @@ export const useAuth = create((set) => ({
   loading: false,
   isAuthenticated: false,
   error: null,
+
   login: async (userCred) => {
-    // const { role, ...userCredObj } = userCredWithRole;
     try {
-      //set loading true
       set({ loading: true, currentUser: null, isAuthenticated: false, error: null });
-      //make api call
       let res = await axiosInstance.post("/auth/login", userCred);
-      //update state
       if (res.status === 200) {
+        // ✅ Save token to localStorage
+        localStorage.setItem("token", res.data.token);
         set({
           currentUser: res.data?.payload,
           loading: false,
@@ -29,60 +27,57 @@ export const useAuth = create((set) => ({
         loading: false,
         isAuthenticated: false,
         currentUser: null,
-        //error: err,
-        error: err.response?.data?.error || "Login failed",
+        error: err.response?.data?.message || "Login failed",
       });
     }
   },
+
   logout: async () => {
     try {
-      //set loading state
-      //make logout api req
-      let res = await axiosInstance.get("/auth/logout");
-      //update state
-      if (res.status === 200) {
-        set({
-          currentUser: null,
-          isAuthenticated: false,
-          error: null,
-          loading: false,
-        });
-      }
+      await axiosInstance.get("/auth/logout");
+      // ✅ Remove token from localStorage
+      localStorage.removeItem("token");
+      set({
+        currentUser: null,
+        isAuthenticated: false,
+        error: null,
+        loading: false,
+      });
     } catch (err) {
+      // ✅ Even if API call fails, clear localStorage
+      localStorage.removeItem("token");
       set({
         loading: false,
         isAuthenticated: false,
         currentUser: null,
-        error: err.response?.data?.error || "Logout failed",
+        error: err.response?.data?.message || "Logout failed",
       });
     }
   },
 
-  // restore login
   checkAuth: async () => {
     try {
+      // ✅ If no token in localStorage, skip API call
+      const token = localStorage.getItem("token");
+      if (!token) {
+        set({ currentUser: null, isAuthenticated: false, loading: false });
+        return;
+      }
       set({ loading: true });
       const res = await axiosInstance.get("/auth/check-auth");
-
       set({
         currentUser: res.data.payload,
         isAuthenticated: true,
         loading: false,
       });
     } catch (err) {
-      // If user is not logged in → do nothing
-      if (err.response?.status === 401) {
-        set({
-          currentUser: null,
-          isAuthenticated: false,
-          loading: false,
-        });
-        return;
-      }
-
-      // other errors
-      console.error("Auth check failed:", err);
-      set({ loading: false });
+      // ✅ Clear bad/expired token
+      localStorage.removeItem("token");
+      set({
+        currentUser: null,
+        isAuthenticated: false,
+        loading: false,
+      });
     }
   },
 }));

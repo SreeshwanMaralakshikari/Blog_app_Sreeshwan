@@ -1,65 +1,31 @@
 import jwt from 'jsonwebtoken'
-import {config} from 'dotenv';
-const {verify}=jwt;
+import { config } from 'dotenv';
+const { verify } = jwt;
 
 config();
 
-export const verifyToken=(...allowedRoles)=>{
-    return (req,res,next)=>{
-    const token=req.cookies?.token;
-    //if req from unauthorized user
-    if(!token)
-    {
-        return res.status(401).json({message: "Please Login First"})
-    }
-    try
-    {   
-        //If token is existed
-        const decodedToken=verify(token,process.env.SECRET_KEY);
-        //add the decoded token to 
-        console.log(decodedToken);
-        //check the role is same as role in decodedToken
-        if(!allowedRoles.includes(decodedToken.role)){
-            return res.status(403).json({message:"You are not authorized"})
+export const verifyToken = (...allowedRoles) => {
+    return (req, res, next) => {
+
+        // ✅ Read token from Authorization header instead of cookie
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(" ")[1]; // "Bearer <token>"
+
+        if (!token) {
+            return res.status(401).json({ message: "Please Login First" });
         }
-        //add the decoded token
-        req.user=decodedToken;
-        //call next
-        next();
-    }
-    //If Token verification failed
-    catch(err)
-    {
-        res.status(401).json({message:"Session Expired. Please Relogin"})
-    }
-  };
+        try {
+            const decodedToken = verify(token, process.env.SECRET_KEY);
+            console.log(decodedToken);
+
+            if (!allowedRoles.includes(decodedToken.role)) {
+                return res.status(403).json({ message: "You are not authorized" });
+            }
+
+            req.user = decodedToken;
+            next();
+        } catch (err) {
+            res.status(401).json({ message: "Session Expired. Please Relogin" });
+        }
+    };
 };
-
-
-/*export function verifyToken(req,res,next)
-{
-    const token=req.cookies?.token;
-    //if req from unauthorized user
-    if(!token)
-    {
-        return res.status(401).json({message: "Please Login First"})
-    }
-    try
-    {   
-        //If token is existed
-        const decodedToken=verify(token,process.env.SECRET_KEY);
-        //add the decoded token to 
-        console.log(decodedToken);
-        //check the role is same as role in decodedToken
-    
-        //add the decoded token
-        req.user=decodedToken;
-        //call next
-        next();
-    }
-    //If Token verification failed
-    catch(err)
-    {
-        res.status(401).json({message:"Session Expired. Please Relogin"})
-    }
-}*/
